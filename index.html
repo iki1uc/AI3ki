@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>OPTA · 6E→6D · ROOM‑Engine</title>
+<title>OPTA · 6E→6D · ROOM‑Engine · v2.0</title>
 
 <style>
 body { background:#000; color:#0f0; font-family:monospace; padding:30px; }
@@ -35,59 +35,20 @@ pre {
 }
 
 .segment { color:#4cf; font-size:12px; margin-top:5px; }
+
+/* Mini-Diagramme */
+.diagram {
+    background:#000;
+    border:1px solid #333;
+    padding:10px;
+    margin-top:10px;
+    font-size:12px;
+    white-space:pre;
+    color:#6cf;
+}
 </style>
 </head>
 
 <body>
 
-<h1>OPTA · 6E→6D · ROOM‑Engine‑Index</h1>
-
-<div class="grid" id="grid"></div>
-
-<script>
-// Achsen → Alias → ROOM-Datei
-const axes = {
-    "T": { alias: "A", room: "T.room" },
-    "U": { alias: "W", room: "U.room" },
-    "H": { alias: "Q", room: "H.room" },
-    "B": { alias: "S", room: "B.room" },
-    "Y": { alias: "V", room: "Y.room" },
-    "Z": { alias: "X", room: "Z.room" }
-};
-
-// ROOM-Datei laden
-async function loadRoom(axis, roomFile) {
-    try {
-        const res = await fetch(axis + "/" + roomFile);
-        if (!res.ok) return "ROOM-Datei nicht gefunden.";
-        return await res.text();
-    } catch {
-        return "ROOM konnte nicht geladen werden.";
-    }
-}
-
-async function buildGrid() {
-    const grid = document.getElementById("grid");
-
-    for (const axis of Object.keys(axes)) {
-        const data = axes[axis];
-        const roomContent = await loadRoom(axis, data.room);
-
-        const block = document.createElement("div");
-        block.className = "block";
-
-        block.innerHTML = `
-            <h2>${data.alias} · Achse ${axis}</h2>
-            <div class="segment">ROOM: ${data.room}</div>
-            <pre>${roomContent}</pre>
-        `;
-
-        grid.appendChild(block);
-    }
-}
-
-buildGrid();
-</script>
-
-</body>
-</html>
+<h1>OPTA · 6E→6D · ROOM‑Engine
