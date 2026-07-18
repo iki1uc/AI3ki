@@ -1,7 +1,27 @@
-transfer.6E_to_6D.raw = {
-    impulse_map: ALL×ALL.6E → ALL×ALL.6D,
-    gradient_map: 6E.gradient → 6D.gradient,
-    axis_anchor: geoAxes,
-    vector_align: geoLAGE,
-    station_bind: STATIONEN.raw
+const AXIS = {
+    "A": { engine: "T", dim: "Tiefe" },
+    "W": { engine: "U", dim: "Ultra" },
+    "Q": { engine: "H", dim: "Höhe" },
+    "S": { engine: "B", dim: "Breite" },
+    "V": { engine: "Y", dim: "Y‑Vektor" },
+    "X": { engine: "Z", dim: "Z‑Vektor" }
+};
+
+// OCTA‑Routing
+const OCTA = {
+    "OCTA2": "NC²octa².dual",
+    "OCTA3": "NC²octa³.align"
+};
+
+// 6E → 6D Übersetzung
+function translate6Eto6D(axisLetter, zone) {
+    const axis = AXIS[axisLetter];
+    if (!axis) return null;
+
+    return {
+        engine: axis.engine + "." + zone,
+        dimension: axis.dim,
+        octa2: OCTA.OCTA2,
+        octa3: OCTA.OCTA3
+    };
 }
