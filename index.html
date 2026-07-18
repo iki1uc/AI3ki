@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>OPTA · Achsen‑Index</title>
+<title>OPTA · 6E→6D · ROOM‑Engine</title>
 
 <style>
 body { background:#000; color:#0f0; font-family:monospace; padding:30px; }
@@ -26,72 +26,68 @@ h1 { color:#6cf; margin-bottom:25px; }
     margin-bottom:10px;
 }
 
-ul { list-style:none; padding:0; }
-li { padding:4px 0; border-bottom:1px solid #222; }
-a { color:#6cf; text-decoration:none; }
-a:hover { text-decoration:underline; }
+pre {
+    background:#000;
+    border-left:3px solid #6cf;
+    padding:15px;
+    white-space:pre-wrap;
+    margin-top:10px;
+}
 
 .segment { color:#4cf; font-size:12px; margin-top:5px; }
-.group-title { color:#0f0; margin-top:10px; font-size:14px; }
 </style>
 </head>
 
 <body>
 
-<h1>OPTA · Achsen‑Index</h1>
+<h1>OPTA · 6E→6D · ROOM‑Engine‑Index</h1>
 
 <div class="grid" id="grid"></div>
 
 <script>
-// Achsen → Alias → Loop-Modus
+// Achsen → Alias → ROOM-Datei
 const axes = {
-    "T": { alias: "A", loop: "698869" },
-    "U": { alias: "W", loop: "968896" },
-    "H": { alias: "Q", loop: "698869" },
-    "B": { alias: "S", loop: "698869" },
-    "Y": { alias: "V", loop: "968896" },
-    "Z": { alias: "X", loop: "698869" }
+    "T": { alias: "A", room: "T.room" },
+    "U": { alias: "W", room: "U.room" },
+    "H": { alias: "Q", room: "H.room" },
+    "B": { alias: "S", room: "B.room" },
+    "Y": { alias: "V", room: "Y.room" },
+    "Z": { alias: "X", room: "Z.room" }
 };
 
-// Dateigruppen
-const groups = {
-    "NC²": [
-        "NC²",
-        "NC² (1)",
-        "NC²octa².dual",
-        "NC²octa²□.merge",
-        "NC²□ (1).lock",
-        "NC²□ (1).sync",
-        "NC²□.lock",
-        "NC²□.sync",
-        "NC²□octa³.align"
-    ],
-    "RAW6D": [
-        "6D‑Baum.raw",
-        "6E → 6D.tech",
-        "STATIONEN.raw"
-    ],
-    "ROOM": [
-        "T.room",
-        "U.room",
-        "H.room",
-        "B.room",
-        "Y.room",
-        "Z.room",
-        "12e allin allout.room"
-    ],
-    "PYRAMIDEN": [
-        "level-pyramiden-7.csv",
-        "level-pyramiden-7 (1).csv",
-        "level-pyramiden-7 (2).csv",
-        "level-pyramiden-7 (3).csv",
-        "level-pyramiden-7 (4).csv",
-        "level-pyramiden-7 (5).csv",
-        "level-pyramiden-7 (6).csv",
-        "level-pyramiden-7 (7).csv"
-    ]
-};
-
-async function scanAxis(axis) {
+// ROOM-Datei laden
+async function loadRoom(axis, roomFile) {
     try {
-        const res = await fetch(axis + "/");
+        const res = await fetch(axis + "/" + roomFile);
+        if (!res.ok) return "ROOM-Datei nicht gefunden.";
+        return await res.text();
+    } catch {
+        return "ROOM konnte nicht geladen werden.";
+    }
+}
+
+async function buildGrid() {
+    const grid = document.getElementById("grid");
+
+    for (const axis of Object.keys(axes)) {
+        const data = axes[axis];
+        const roomContent = await loadRoom(axis, data.room);
+
+        const block = document.createElement("div");
+        block.className = "block";
+
+        block.innerHTML = `
+            <h2>${data.alias} · Achse ${axis}</h2>
+            <div class="segment">ROOM: ${data.room}</div>
+            <pre>${roomContent}</pre>
+        `;
+
+        grid.appendChild(block);
+    }
+}
+
+buildGrid();
+</script>
+
+</body>
+</html>
