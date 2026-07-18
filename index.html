@@ -2,50 +2,119 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>360 – Vollrotation · iki1uc</title>
+<title>OPTA · Achsen‑Engine‑Index</title>
 
 <style>
-body { background:#000; color:#0f0; font-family:monospace; padding:40px; }
-h1 { color:#0f0; letter-spacing:4px; margin-bottom:30px; }
-.block { background:#111; border:1px solid #333; padding:25px; margin-bottom:30px; border-radius:8px; }
-.title { font-size:22px; color:#6cf; margin-bottom:10px; }
-a { color:#6cf; text-decoration:none; font-weight:bold; }
-pre { background:#000; border-left:3px solid #6cf; padding:15px; margin-top:10px; white-space:pre-wrap; }
+body { background:#000; color:#0f0; font-family:monospace; padding:30px; }
+h1 { color:#6cf; margin-bottom:25px; }
+.grid {
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+}
+.block {
+    background:#111;
+    border:1px solid #333;
+    padding:20px;
+    border-radius:8px;
+}
+.block h2 {
+    color:#6cf;
+    margin-bottom:10px;
+}
+ul { list-style:none; padding:0; }
+li { padding:4px 0; border-bottom:1px solid #222; }
+a { color:#6cf; text-decoration:none; }
+a:hover { text-decoration:underline; }
+.segment { color:#4cf; font-size:12px; margin-top:5px; }
 </style>
 </head>
 
 <body>
 
-<h1>360 – Vollrotation · iki1uc</h1>
+<h1>OPTA · Achsen‑Engine‑Index</h1>
 
-<div class="block">
-    <div class="title">360°-System</div>
-    <p>Dieses Modul rotiert alle Achsen, Dimensionen und Module im vollständigen 360°-Raum.</p>
-</div>
+<div class="grid" id="grid"></div>
 
-<div class="block">
-    <div class="title">Identität</div>
-    <p><a href="ID.html">→ 360‑Identität öffnen</a></p>
-</div>
+<script>
+// Achsen → Alias → Loop-Modus
+const axes = {
+    "T": { alias: "A", loop: "698869" },
+    "U": { alias: "W", loop: "968896" },
+    "H": { alias: "Q", loop: "698869" },
+    "B": { alias: "S", loop: "698869" },
+    "Y": { alias: "V", loop: "968896" },
+    "Z": { alias: "X", loop: "698869" }
+};
 
-<div class="block">
-    <div class="title">360°-Daten</div>
-    <pre>
-Rotation = 360°
-Achsenmatrix = 6×6
-Dimensionen = 6D
-Felder pro Achse = 64
-Ausnutzung = 100%
-    </pre>
-</div>
+// Dateien, die wir anzeigen wollen
+const importantFiles = [
+    "12e allin allout.room",
+    "6D‑Baum.raw",
+    "6E → 6D.tech",
+    "NC²",
+    "NC²octa².dual",
+    "NC²octa³.align",
+    "NC²□.lock",
+    "NC²□.sync",
+    "STATIONEN.raw",
+    "T.room",
+    "U.room",
+    "H.room",
+    "B.room",
+    "Y.room",
+    "Z.room",
+    "level-pyramiden-7.csv"
+];
 
-<div class="block">
-    <div class="title">Module</div>
-    <a href="../AXI/index.html">AXI</a>
-    <a href="../6d/index.html">6d</a>
-    <a href="../ANKER/index.html">ANKER</a>
-    <a href="../API/index.html">API</a>
-</div>
+async function scanAxis(axis) {
+    try {
+        const res = await fetch(axis + "/");
+        if (!res.ok) return null;
+
+        const html = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const links = [...doc.querySelectorAll("a")];
+
+        const files = links
+            .map(a => a.textContent.trim())
+            .filter(name => importantFiles.includes(name));
+
+        return files;
+    } catch {
+        return null;
+    }
+}
+
+async function buildGrid() {
+    const grid = document.getElementById("grid");
+
+    for (const axis of Object.keys(axes)) {
+        const data = axes[axis];
+        const files = await scanAxis(axis);
+
+        if (!files) continue;
+
+        const block = document.createElement("div");
+        block.className = "block";
+
+        block.innerHTML = `
+            <h2>${data.alias} · Achse ${axis}</h2>
+            <div class="segment">Loop: ${data.loop}</div>
+            <div class="segment">OPTA²: NC²octa².dual</div>
+            <div class="segment">OPTA³: NC²octa³.align</div>
+            <ul>
+                ${files.map(f => `<li><a href="./${axis}/${f}">${f}</a></li>`).join("")}
+            </ul>
+        `;
+
+        grid.appendChild(block);
+    }
+}
+
+buildGrid();
+</script>
 
 </body>
 </html>
